@@ -33,7 +33,7 @@ class ELO_management(object):
         elo value, referenced from `self.starting_elo`"""
         self.player_elo_cache.update({player:self.starting_elo})
         return 0
-        
+
     def show_cache(self):
         print(self.player_elo_cache)
 
@@ -51,8 +51,8 @@ class ELO(object):
         player1_elo = self.EM.fetch_elo(player1)
         player2_elo = self.EM.fetch_elo(player2)
 
-        player1_w_prob = (1.0 / (1.0 + pow(10, ((player2_elo - player1_elo) / 400))))
-        player2_w_prob = (1.0 / (1.0 + pow(10, ((player1_elo - player2_elo) / 400))))
+        player1_w_prob = (1.0 / (1.0 + 10**((player2_elo - player1_elo) / 400)))
+        player2_w_prob = (1.0 / (1.0 + 10**((player1_elo - player2_elo) / 400)))
 
         return player1_w_prob, player2_w_prob
 
