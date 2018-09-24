@@ -44,6 +44,16 @@ class ELO(object):
         self.K = K
         if len(player_list) > 0:
             [self.EM.new_player(player) for player in player_list]
+        
+    def reset_function(self, player_elo_dict):
+        """The reset function that is employed for resets. This can be overridden based on settings
+        that you'd like to apply to the global elo's of players when there is some form of reset in
+        play. This function is executed by this classes `season_reset` function."""
+        for player in player_elo_dict.keys():
+            current_elo = player_elo_dict[player]
+            new_elo = current_elo + (self.EM.starting_elo - current_elo) / 2.0
+            player_elo_dict[player] = new_elo
+        return player_elo_dict
 
     @staticmethod
     def get_win_probibility(player1_elo, player2_elo):
@@ -54,7 +64,7 @@ class ELO(object):
         return player1_w_prob, player2_w_prob
 
     def do_competition(self, winner, loser):
-        """Retrieve each of the players current elo ratings by using the ELO_management class.
+        """Retriesve each of the players current elo ratings by using the ELO_management class.
         Then apply new ratings based on which player has won"""
         winner_elo = self.EM.fetch_elo(winner)
         loser_elo = self.EM.fetch_elo(loser)
@@ -65,7 +75,7 @@ class ELO(object):
 
         if loser_new_elo < 0:
             loser_new_elo = 0
-        
+
         self.EM.update_elo(winner, winner_new_elo)
         self.EM.update_elo(loser, loser_new_elo)
         return 0
@@ -74,10 +84,9 @@ class ELO(object):
         for player in player_list:
             self.EM.new_player(player)
         return 0
-
-    # def 
-    #     cached_scores = {}
-    #     for player in [player1,player2]:
-    #         cached_scores.update({player:self.player_elo_cache[player]})
-    #     return cached_scores
-    # def 
+    
+    def season_reset(self):
+        """Resets the playing field by implementing the `self.reset_function` against the entire
+        cache of players managed by `self.EM`"""
+        self.EM.player_elo_cache = self.reset_function(self.EM.player_elo_cache)
+        return 0
