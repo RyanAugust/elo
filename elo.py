@@ -1,28 +1,81 @@
-class ELO(object):
+class ELO_management(object):
     def __init__(self):
         self.player_elo_cache = {}
         self.starting_elo = 1600
 
-    def update_elo(self, team, new_elo):
+    def update_elo(self, player, new_elo):
+        self.cache_checker(player)
+        """Is this the intended functionality? This would be a situation where you're checking for
+        the presence of a player and in the event that player isn't in the cache default value 
+        would be applied, you would then come to the next line and be applying a new elo socre to
+        them thus overrideing the default value placement"""
+        self.player_elo_cache[player] = new_elo
+        return 0
 
-    def calculate_elo(self, player1, player2):
+    # def calculate_elo(self, player1, player2):
+    #     cached_scores = self.fetch_elos(player1, player2)
 
-    def fetch_elos(self, player1, player2):
-    	"""return `player1` and `player2` elo scores from the class cache.
-    	integrety check is completed by `cache_checker` to ensure players are available"""
-        self.cache_checker(player1)
-        self.cache_checker(player2)
-
+    def fetch_elo(self, player):
+        """return `player1` and `player2` elo scores from the class cache.
+        integrety check is completed by `cache_checker` to ensure players are available"""
+        self.cache_checker(player)
+        return self.player_elo_cache[player]
 
     def cache_checker(self, player):
-    	"""Ensure that every player passed is either present in the cache with an active elo score.
-    	In the event a player is not in the cache calls `new_player` to update cache"""
-    	if player not in self.player_elo_cache.keys():
-    		self.new_player(player)
-    	return 0
+        """Ensure that every player passed is either present in the cache with an active elo score.
+        In the event a player is not in the cache calls `new_player` to update cache"""
+        if player not in self.player_elo_cache.keys():
+            self.new_player(player)
+        return 0
 
     def new_player(self, player):
-    	""" When passed a player, adds the player to the cache of players using the default starting
-    	elo value, referenced from `self.starting_elo`"""
-    	self.player_elo_cache.update({player:self.starting_elo})
-    	return 0
+        """ When passed a player, adds the player to the cache of players using the default starting
+        elo value, referenced from `self.starting_elo`"""
+        self.player_elo_cache.update({player:self.starting_elo})
+        return 0
+        
+    def show_cache(self):
+        print(self.player_elo_cache)
+
+
+class ELO(object):
+    def __init__(self, K=32, player_list=[]):
+        self.EM = ELO_management()
+        self.K = K
+        if len(player_list) > 0:
+            [self.EM.new_player(player) for player in player_list]
+
+    def get_win_probibility(self, player1, player2):
+        """Retrieve each of the players current elo ratings by using the ELO_management class. Then
+        compute the head to head win probilbility for each player."""
+        player1_elo = self.EM.fetch_elo(player1)
+        player2_elo = self.EM.fetch_elo(player2)
+
+        player1_w_prob = (1.0 / (1.0 + pow(10, ((player2_elo - player1_elo) / 400))))
+        player2_w_prob = (1.0 / (1.0 + pow(10, ((player1_elo - player2_elo) / 400))))
+
+        return player1_w_prob, player2_w_prob
+
+    def do_competition(self, winner, loser):
+        winner_elo = EM.fetch_elo(winner)
+        loser_elo = EM.fetch_elo(loser)
+
+        winner_w_prob, loser_w_prob = get_win_probibility(winner, loser)
+        winner_new_elo = winner_elo * self.K (1 - winner_w_prob)
+        loser_new_elo = loser_elo * self.K (0 - loser_w_prob)
+
+        self.EM.update_elo(winner, winner_new_elo)
+        self.EM.update_elo(loser, loser_new_elo)
+        return 0
+
+    def add_players(self, player_list):
+        for player in player_list:
+            self.EM.new_player(player)
+        return 0
+
+    # def 
+    #     cached_scores = {}
+    #     for player in [player1,player2]:
+    #         cached_scores.update({player:self.player_elo_cache[player]})
+    #     return cached_scores
+    # def 
