@@ -1,6 +1,7 @@
 import numpy as np
 
 class ELO_management(object):
+    """ELO manager for multi-member competitve tracking"""
     def __init__(self):
         self.member_elo_cache = {}
         self.starting_elo = 1600
